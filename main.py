@@ -18,6 +18,9 @@ async def main():
     # Выводим в консоль информацию о начале запуска бота
     logger.info('Starting bot')
 
+    # Загружаем конфиг в переменную config
+    config: Config = load_config()
+
     # Инициализируем бота и диспетчер
     bot = Bot(
         token=config.tg_bot.token,

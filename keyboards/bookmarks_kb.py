@@ -1,18 +1,47 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from lexicon.lexicon import LEXICON
+from services.file_handling import book
 
-# Основная клавиатура
-main_kb = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Меню 1"), KeyboardButton(text="Меню 2")],
-        [KeyboardButton(text="Помощь")]
-    ],
-    resize_keyboard=True
-)
+def create_bookmarks_keyboard(*args: int) -> InlineKeyboardMarkup:
+    # Создаем объект клавиатуры
+    kb_builder = InlineKeyboardBuilder()
+    # Наполняем клавиатуру кнопками-закладками в порядке возрастания
+    for button in sorted(args):
+        kb_builder.row(InlineKeyboardButton(
+            text=f'{button} - {book[button][:100]}' ,
+            callback_data=str(button)
+        ))
 
-# Инлайн клавиатура (пример)
-inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text="Кнопка 1", callback_data="button1")],
-        [InlineKeyboardButton(text="Кнопка 2", callback_data="button2")]
-    ]
-) 
+    # Добавляем в клавиатуру в конце две кнопки "Редактировать" и "Отменить"
+    kb_builder.row(
+        InlineKeyboardButton(
+            text=LEXICON['cancel'],
+            callback_data='cancel'
+        ),
+        InlineKeyboardButton(
+            text=LEXICON['edit_bookmarks_button'],
+            callback_data='edit_bookmarks'
+        ),
+        width=2
+    )
+    return kb_builder.as_markup()
+
+def create_edit_keyboard(*args: int) -> InlineKeyboardMarkup:
+    # Создаем объект клавиатуры
+    kb_builder = InlineKeyboardBuilder()
+    # Наполняем клавиатуру кнопками-закладками в порядке возрастания
+    for button in sorted(args):
+        kb_builder.row(InlineKeyboardButton(
+            text=f'{LEXICON["del"]} {button} - {book[button][:100]}' ,
+            callback_data=f'{button}del'
+        ))
+
+    # Добавляем в конец клавиатуры кнопку "Отменить"
+    kb_builder.row(
+        InlineKeyboardButton(
+            text=LEXICON['cancel'],
+            callback_data='cancel'
+        )
+    )
+    return kb_builder.as_markup()
